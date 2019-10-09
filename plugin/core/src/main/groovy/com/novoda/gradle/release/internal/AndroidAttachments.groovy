@@ -1,5 +1,6 @@
 package com.novoda.gradle.release.internal
 
+import com.android.build.gradle.api.LibraryVariant
 import com.novoda.gradle.release.MavenPublicationAttachments
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -49,15 +50,15 @@ class AndroidAttachments extends MavenPublicationAttachments {
         return sourcesJarTask(project, publicationName, sourcePaths)
     }
 
-    private static Task androidJavadocsJarTask(Project project, String publicationName, def variant) {
+    private static Task androidJavadocsJarTask(Project project, String publicationName, LibraryVariant variant) {
         Javadoc javadoc = project.task("javadoc${publicationName.capitalize()}", type: Javadoc) { Javadoc javadoc ->
-            javadoc.source = variant.javaCompiler.source
-            javadoc.classpath = variant.javaCompiler.classpath
+            javadoc.source = variant.javaCompileProvider.getOrNull().source
+            javadoc.classpath = variant.javaCompileProvider.getOrNull() .classpath
         } as Javadoc
         return javadocsJarTask(project, publicationName, javadoc)
     }
 
-    private static def androidArchivePath(def variant) {
-        return variant.outputs[0].packageLibrary
+    private static def androidArchivePath(LibraryVariant variant) {
+        return variant.packageLibraryProvider.getOrNull()
     }
 }
